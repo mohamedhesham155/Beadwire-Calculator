@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elsewedy Steel - Bead Wire Systems</title>
+    <style>
+        :root {
+            --navy-deep: #000a1f;
+            --navy-bright: #001b4d; 
+            --brand-red: #cc0000;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--navy-deep);
+            color: var(--white);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            padding: 30px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--navy-bright), var(--navy-deep));
+            border-bottom: 4px solid var(--brand-red);
+        }
+
+        h1 { font-size: 2.2rem; margin: 0; font-weight: 900; }
+        h1 span { color: var(--brand-red); }
+        .subtitle { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 20px 40px;
+        }
+
+        .card {
+            background: var(--white);
+            color: #333;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 { 
+            color: var(--navy-deep); 
+            text-align: center; 
+            margin-top: 0;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--navy-bright); font-size: 0.85rem; }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        input:focus { border-color: var(--brand-red); outline: none; }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn-navy { background: var(--navy-deep); }
+        .btn-red { background: var(--brand-red); }
+        .btn-chem { background: #2c3e50; border-right: 5px solid var(--brand-red); }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            border: 1px solid #ddd;
+        }
+
+        .res-text { font-size: 1.5rem; font-weight: 800; color: var(--navy-deep); }
+        .res-unit { font-size: 1rem; color: var(--brand-red); margin-right: 5px; }
+
+        footer { text-align: center; padding: 20px; font-size: 0.7rem; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>elsewedyn<span>steel</span></h1>
+        <div class="subtitle">نظام حسابات الإنتاج والتعويض الكيميائي</div>
+    </header>
+
+    <div class="container">
+        
+        <!-- القسم الجديد: التعويض الكيميائي -->
+        <div class="card">
+            <h2>🧪 التعويض الكيميائي (Consumption)</h2>
+            <div class="input-group">
+                <label>نوع المادة / الحوض:</label>
+                <select id="chemType">
+                    <option value="kg">Copper Sulfate (kg)</option>
+                    <option value="L">H2SO4 (Liters)</option>
+                    <option value="g">Tin (grams)</option>
+                    <option value="kg">FeSO4 (kg)</option>
+                </select>
+            </div>
+            <div class="grid-inputs">
+                <div class="input-group">
+                    <label>التركيز الحالي (g/l):</label>
+                    <input type="number" id="currConc" placeholder="مثال: 16" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>التركيز المطلوب (g/l):</label>
+                    <input type="number" id="wantConc" placeholder="مثال: 25" step="0.01">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>حجم الحوض (Liters):</label>
+                <input type="number" id="tankVol" placeholder="مثال: 3186.38" step="0.01">
+            </div>
+            <button class="btn-chem" onclick="calcChem()">حساب الكمية المطلوب إضافتها</button>
+            
+            <div id="resChem" class="result">
+                <div class="res-text">
+                    <span id="chemVal"></span>
+                    <span id="chemUnit" class="res-unit"></span>
+                </div>
+                <div style="font-size: 0.8rem; color: #666; margin-top:5px;">Amount to be added</div>
+            </div>
+        </div>
+
+        <!-- الأقسام السابقة -->
+        <div class="card">
+            <h2>⏱️ حساب وقت الإنتاج المتبقي</h2>
+            <div class="grid-inputs">
+                <div class="input-group">
+                    <label>الكمية (كجم):</label>
+                    <input type="number" id="qty" value="2000">
+                </div>
+                <div class="input-group">
+                    <label>المقاس (مم):</label>
+                    <input type="number" id="sizeTime" step="0.01" value="1.65">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>السرعة (mpm):</label>
+                <input type="number" id="speedIn" value="240">
+            </div>
+            <button class="btn-navy" onclick="calcTime()">احسب الوقت</button>
+            <div id="resTime" class="result">
+                <div id="timeVal" class="res-text"></div>
+            </div>
+        </div>
+
+        <div class="card" style="border-right: 6px solid var(--brand-red);">
+            <h2>🚀 السرعة القصوى الموصى بها</h2>
+            <div class="input-group">
+                <label>مقاس السلك (مم):</label>
+                <input type="number" id="sizeSpeed" step="0.01" placeholder="مثال: 1.65">
+            </div>
+            <button class="btn-red" onclick="calcSpeed()">استخراج السرعة</button>
+            <div id="resSpeed" class="result">
+                <div id="speedVal" class="res-text" style="color: var(--brand-red);"></div>
+            </div>
+        </div>
+
+        <footer>&copy; 2024 Elsewedy Steel - Production Tools</footer>
+    </div>
+
+    <script>
+        // حساب التعويض الكيميائي
+        function calcChem() {
+            const current = parseFloat(document.getElementById('currConc').value);
+            const wanted = parseFloat(document.getElementById('wantConc').value);
+            const volume = parseFloat(document.getElementById('tankVol').value);
+            const unit = document.getElementById('chemType').value;
+
+            if (!isNaN(current) && !isNaN(wanted) && !isNaN(volume)) {
+                // المعادلة: الفرق في التركيز مضروب في حجم الحوض
+                // النتيجة بالجرام، ثم نحولها للكجم إذا لزم الأمر حسب نوع المادة
+                let result = (wanted - current) * volume;
+                
+                let finalVal;
+                if (unit === "kg" || unit === "L") {
+                    finalVal = (result / 1000).toFixed(2); // تحويل من g إلى kg/L
+                } else {
+                    finalVal = result.toFixed(2); // تبقى بالجرام g
+                }
+
+                const display = document.getElementById('resChem');
+                display.style.display = 'block';
+                document.getElementById('chemVal').innerText = finalVal;
+                document.getElementById('chemUnit').innerText = unit;
+            } else {
+                alert("يرجى إدخال جميع البيانات الكيميائية");
+            }
+        }
+
+        // حساب وقت الإنتاج
+        function calcTime() {
+            const q = parseFloat(document.getElementById('qty').value);
+            const s = parseFloat(document.getElementById('sizeTime').value);
+            const v = parseFloat(document.getElementById('speedIn').value);
+            if(q && s && v) {
+                const totalMinutes = ((q * 1000) / (s * s * 6.167)) / v;
+                const h = Math.floor(totalMinutes / 60);
+                const m = Math.round(totalMinutes % 60);
+                document.getElementById('resTime').style.display = 'block';
+                document.getElementById('timeVal').innerText = `${h} ساعة و ${m} دقيقة`;
+            }
+        }
+
+        // حساب السرعة
+        function calcSpeed() {
+            const s = parseFloat(document.getElementById('sizeSpeed').value);
+            if(s && s > 0) {
+                let v = 400 / s;
+                if(v > 400) v = 400;
+                document.getElementById('resSpeed').style.display = 'block';
+                document.getElementById('speedVal').innerText = `${Math.floor(v)} mpm`;
+            }
+        }
+    </script>
+</body>
+</html>
