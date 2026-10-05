@@ -15,7 +15,7 @@ const App = () => {
   // --- حالات التطبيق الرئيسي ---
   const [activeTab, setActiveTab] = useState('production');
   const [production, setProduction] = useState({ wireSize: 1.65, qty: 2000, speed: 240 });
-  const [prodResults, setProdResults] = useState({ timeStr: '', finishTime: '' });
+  const [prodResults, setProdResults] = useState({ timeStr: '', finishTime: '' ,finishlength:""});
   const [selectedCustomer, setSelectedCustomer] = useState('');
   const [chemInputs, setChemInputs] = useState({
     cu_c: '', cu_w: '', sn_c: '', sn_w: '',
@@ -89,19 +89,36 @@ const App = () => {
   const handleLogout = () => signOut(auth);
 
   // --- دالات الإنتاج والكيماويات ---
+  const calculateLength = () => {
+    const d = parseFloat(production.wireSize);
+    const q = parseFloat(production.qty);
+    if (!d || !q) return;
+
+    const totalLength = (q * 1000) / (d * d * 6.167);
+    setProdResults(prev => ({
+      ...prev,
+      finishlength: `${totalLength.toFixed(2)} متر`
+    }));
+    return totalLength;
+  };
+
   const calculateTime = () => {
     const d = parseFloat(production.wireSize);
     const q = parseFloat(production.qty);
     const v = parseFloat(production.speed);
     if (!d || !q || !v) return;
-    const totalMins = ((q * 1000) / (d * d * 6.167)) / v;
+
+    const totalLength = (q * 1000) / (d * d * 6.167);
+    const totalMins = totalLength / v;
     const h = Math.floor(totalMins / 60);
     const m = Math.round(totalMins % 60);
     const now = new Date();
     now.setMinutes(now.getMinutes() + totalMins);
+
     setProdResults({
       timeStr: `${h} ساعة و ${m} دقيقة`,
-      finishTime: now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+      finishTime: now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+      finishlength: `${totalLength.toFixed(2)} متر`
     });
   };
 
@@ -199,6 +216,10 @@ const App = () => {
                 <h3 className="text-6xl font-black mb-4 tracking-tighter">{prodResults.finishTime}</h3>
                 <div className="flex items-center gap-2 text-red-400 font-bold">
                   <Clock size={18}/> <span>يستغرق العمل: {prodResults.timeStr}</span>
+                </div>
+                <div className="mt-4 rounded-2xl bg-white/5 p-4 border border-white/10">
+                  <p className="text-xs font-bold uppercase opacity-60">إجمالي الطول</p>
+                  <p className="text-2xl font-black mt-1">{prodResults.finishlength}</p>
                 </div>
               </div>
             )}
